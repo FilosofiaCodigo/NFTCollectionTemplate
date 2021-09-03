@@ -121,7 +121,7 @@ loadApp()
 
 const mint = async () => {
   const result = await contract.methods.mint(accounts[0], 1)
-    .send({ from: accounts[0], gas: 0, value: 30000000000000000 })
+    .send({ from: accounts[0], gas: 0, value: 10000000000000000 })
     .on('transactionHash', function(hash){
       console.log("transactionHash: El usuario hizo clic en Confirm, esperando confirmación")
     })
