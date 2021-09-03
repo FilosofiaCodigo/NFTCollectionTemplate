@@ -118,18 +118,18 @@ contract MyNFT is ERC721Enumerable, Ownable, ERC721Burnable, ERC721Pausable {
 
     Counters.Counter private _tokenIdTracker;
 
-    uint256 public constant MAX_ELEMENTS = 8888;
-    uint256 public constant PRICE = 3 * 10**16;
+    uint256 public constant MAX_ELEMENTS = 20;
+    uint256 public constant PRICE = 0.01 ether;
     uint256 public constant MAX_BY_MINT = 20;
     uint256 public constant reveal_timestamp = 1627588800; // Thu Jul 29 2021 20:00:00 GMT+0000
-    address public constant creatorAddress = 0x6F84Fa72Ca4554E0eEFcB9032e5A4F1FB41b726C;
-    address public constant devAddress = 0xcBCc84766F2950CF867f42D766c43fB2D2Ba3256;
+    address public constant creatorAddress = 0x730bF3B67090511A64ABA060FbD2F7903536321E;
+    address public constant devAddress = 0x730bF3B67090511A64ABA060FbD2F7903536321E;
     string public baseTokenURI;
 
     event CreatePenguin(uint256 indexed id);
-    constructor(string memory baseURI) ERC721("PudgyPenguins", "PPG") {
+    constructor(string memory baseURI) ERC721("Crocs", "CC") {
         setBaseURI(baseURI);
-        pause(true);
+        //pause(true);
     }
 
     modifier saleIsOpen {
