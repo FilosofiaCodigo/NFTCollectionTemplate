@@ -1,38 +1,58 @@
 const NETWORK_ID = 4
+const NFT_PRICE = 10000000000000000
+var contract
+var accounts
+var web3
+var balance
+
+function metamaskReloadCallback()
+{
+  window.ethereum.on('accountsChanged', (accounts) => {
+    document.getElementById("web3_message").textContent="Accounts changed, realoading...";
+    window.location.reload()
+  })
+  window.ethereum.on('networkChanged', (accounts) => {
+    document.getElementById("web3_message").textContent="Network changed, realoading...";
+    window.location.reload()
+  })
+}
 
 const getWeb3 = async () => {
   return new Promise((resolve, reject) => {
-    console.log(document.readyState)
     if(document.readyState=="complete")
     {
       if (window.ethereum) {
-        const web3 = new Web3(window.ethereum);
+        const web3 = new Web3(window.ethereum)
+        metamaskReloadCallback()
         try {
           // ask user permission to access his accounts
           (async function(){
-            await window.ethereum.request({ method: "eth_requestAccounts" });
+            await window.ethereum.request({ method: "eth_requestAccounts" })
           })()
-          resolve(web3);
+          resolve(web3)
         } catch (error) {
-          reject(error);
+          reject(error)
         }
       } else {
-        reject("must install MetaMask");
+        reject("must install MetaMask")
+        document.getElementById("web3_message").textContent="Error: Please install Metamask";
       }
     }else
     {
       window.addEventListener("load", async () => {
         if (window.ethereum) {
-          const web3 = new Web3(window.ethereum);
+          const web3 = new Web3(window.ethereum)
+          metamaskReloadCallback()
           try {
             // ask user permission to access his accounts
-            await window.ethereum.request({ method: "eth_requestAccounts" });
+            await window.ethereum.request({ method: "eth_requestAccounts" })
             resolve(web3);
           } catch (error) {
             reject(error);
           }
         } else {
-          reject("must install MetaMask");
+          reject("must install MetaMask")
+          document.getElementById("web3_message").textContent="Error: Please install Metamask";
         }
       });
     }
@@ -40,44 +60,34 @@ const getWeb3 = async () => {
 };
 
 function handleRevertError(message) {
-  alert(message);
+  alert(message)
 }
 
 async function getRevertReason(txHash) {
-  const tx = await web3.eth.getTransaction(txHash);
+  const tx = await web3.eth.getTransaction(txHash)
   await web3.eth
     .call(tx, tx.blockNumber)
     .then((result) => {
-      throw Error("unlikely to happen");
+      throw Error("unlikely to happen")
     })
     .catch((revertReason) => {
-      var str = "" + revertReason;
-      json_reason = JSON.parse(str.substring(str.indexOf("{")));
-      console.log(revertReason)
-      //handleRevertError(json_reason.message);
+      var str = "" + revertReason
+      json_reason = JSON.parse(str.substring(str.indexOf("{")))
+      handleRevertError(json_reason.message)
     });
 }
 
 const getContract = async (web3) => {
-  const data = await $.getJSON("./contracts/ChaosCrocs.json");
+  const data = await $.getJSON("./contracts/FunkyCrocs.json")
 
-  const netId = await web3.eth.net.getId();
-  const deployedNetwork = data.networks[netId];
+  const netId = await web3.eth.net.getId()
+  const deployedNetwork = data.networks[netId]
   const contract = new web3.eth.Contract(
     data.abi,
     deployedNetwork && deployedNetwork.address
-  );
-  return contract;
-};
-
-const convertWeiToCrypto = (wei) => {
-  const cryptoValue = web3.utils.fromWei(wei, "ether");
-  return cryptoValue;
-};
-
-const convertCryptoToWei = (crypto) => {
-  return web3.utils.toWei(crypto, "ether");
-};
+  )
+  return contract
+}
 
 var getJSON = function (url, callback) {
   var xhr = new XMLHttpRequest();
@@ -96,21 +106,22 @@ var getJSON = function (url, callback) {
 
 async function loadApp() {
   var awaitWeb3 = async function () {
-    web3 = await getWeb3();
+    web3 = await getWeb3()
     web3.eth.net.getId((err, netId) => {
       if (netId == NETWORK_ID) {
         var awaitContract = async function () {
           contract = await getContract(web3);
           var awaitAccounts = async function () {
             accounts = await web3.eth.getAccounts()
-            console.log("Web3 loaded")
-            //await getRevertReason("0xadb765f94b49121022e713dc42eaa9002dacf0d6b5452f968e4e46942479ceb8")
+            document.getElementById("web3_message").textContent="Connected";
+            balance = await contract.methods.balanceOf(accounts[0]).call()
+            document.getElementById("nft_balance").textContent=balance;
           };
-          awaitAccounts()
+          awaitAccounts();
         };
         awaitContract();
       } else {
-        console.log("Error: Wrong network")
+        document.getElementById("web3_message").textContent="Please connect to Rinkeby Testnet";
       }
     });
   };
@@ -120,14 +131,14 @@ async function loadApp() {
 loadApp()
 
 const mint = async () => {
-  const result = await contract.methods.mint(accounts[0], 1)
-    .send({ from: accounts[0], gas: 0, value: 10000000000000000 })
+  let mint_amount = document.getElementById("mint_amount").value
+  const result = await contract.methods.mint(accounts[0], mint_amount)
+    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
     .on('transactionHash', function(hash){
-      console.log("transactionHash: El usuario hizo clic en Confirm, esperando confirmación")
+      document.getElementById("web3_message").textContent="Minting...";
     })
     .on('receipt', function(receipt){
-      console.log("receipt: Se han escrito los valores en el blockchain")
-    })
+      document.getElementById("web3_message").textContent="Success! Minting finished.";    })
     .catch((revertReason) => {
       getRevertReason(revertReason.receipt.transactionHash);
     });
