@@ -126,7 +126,7 @@ contract MyNFT is ERC721Enumerable, Ownable, ERC721Burnable, ERC721Pausable {
     address public constant devAddress = 0x730bF3B67090511A64ABA060FbD2F7903536321E;
     string public baseTokenURI;
 
-    event CreatePenguin(uint256 indexed id);
+    event CreateNFT(uint256 indexed id);
     constructor(string memory baseURI) ERC721("Crocs", "CC") {
         setBaseURI(baseURI);
         //pause(true);
@@ -160,7 +160,7 @@ contract MyNFT is ERC721Enumerable, Ownable, ERC721Burnable, ERC721Pausable {
         uint id = _totalSupply();
         _tokenIdTracker.increment();
         _safeMint(_to, id);
-        emit CreatePenguin(id);
+        emit CreateNFT(id);
     }
     function price(uint256 _count) public pure returns (uint256) {
         return PRICE.mul(_count);
