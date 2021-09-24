@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract MyNFT is ERC721Enumerable {
+contract MyNFTCollection is ERC721Enumerable {
     uint256 public MAX_ELEMENTS = 5;
     uint256 public PRICE = 0.01 ether;
     address public CREATOR = 0x0000000000000000000000000000000000000000;
