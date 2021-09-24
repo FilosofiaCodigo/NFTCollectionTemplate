@@ -78,7 +78,7 @@ async function getRevertReason(txHash) {
 }
 
 const getContract = async (web3) => {
-  const data = await $.getJSON("./contracts/FunkyCrocs.json")
+  const data = await getJSON("./contracts/FunkyCrocs.json")
 
   const netId = await web3.eth.net.getId()
   const deployedNetwork = data.networks[netId]
@@ -89,20 +89,17 @@ const getContract = async (web3) => {
   return contract
 }
 
-var getJSON = function (url, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", url, true);
-  xhr.responseType = "json";
-  xhr.onload = function () {
-    var status = xhr.status;
-    if (status === 200) {
-      callback(null, xhr.response);
-    } else {
-      callback(status, xhr.response);
-    }
-  };
-  xhr.send();
-};
+function getJSON(url) {
+  return new Promise(resolve => {
+    var xhr = new XMLHttpRequest()
+    xhr.open("GET", url, true)
+    xhr.responseType = "json"
+    xhr.onload = function () {
+      resolve(xhr.response)
+    };
+    xhr.send()
+  });
+}
 
 async function loadApp() {
   var awaitWeb3 = async function () {
