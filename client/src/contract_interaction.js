@@ -1,9 +1,9 @@
 const NETWORK_ID = 4
-const NFT_PRICE = 10000000000000000
 var contract
 var accounts
 var web3
 var balance
+var price
 
 function metamaskReloadCallback()
 {
@@ -78,7 +78,7 @@ async function getRevertReason(txHash) {
 }
 
 const getContract = async (web3) => {
-  const data = await getJSON("./contracts/FunkyCrocs.json")
+  const data = await getJSON("./contracts/MyNFTCollection.json")
 
   const netId = await web3.eth.net.getId()
   const deployedNetwork = data.networks[netId]
@@ -113,6 +113,7 @@ async function loadApp() {
             document.getElementById("web3_message").textContent="Connected";
             balance = await contract.methods.balanceOf(accounts[0]).call()
             document.getElementById("nft_balance").textContent=balance;
+            price = await contract.methods.PRICE().call()
           };
           awaitAccounts();
         };
@@ -130,7 +131,7 @@ loadApp()
 const mint = async () => {
   let mint_amount = document.getElementById("mint_amount").value
   const result = await contract.methods.mint(accounts[0], mint_amount)
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+    .send({ from: accounts[0], gas: 0, value: price * mint_amount })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
