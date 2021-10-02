@@ -1,4 +1,15 @@
-## Checklist
+## NFT Collection API 🖼️
+
+| Feature | Supported |
+|----------|------------ |
+| MIT License | ✔ |
+| Truffle | ✔ |
+| OpenZeppelin Libraries | ✔ |
+| Functional collection base smart contract | ✔ |
+| Clean JS and HTML | ✔ |
+| Simple and adaptable frontend | ✔ |
+
+## How to use 📝
 
 1. Install the dependencies: `npm install --save-dev truffle dotenv @truffle/hdwallet-provider @openzeppelin/contracts`
 3. Edit `./contracts/MyNFTCollection.sol`
