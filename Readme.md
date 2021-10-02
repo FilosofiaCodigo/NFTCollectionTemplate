@@ -1,13 +1,12 @@
-## NFT Collection API 🖼️
+## NFT Collection Template 🖼️
 
 | Feature | Supported |
 |----------|------------ |
 | MIT License | ✔ |
+| Customizable Smart Contract | ✔ |
+| Clean and adaptable frontend | ✔ |
 | Truffle | ✔ |
 | OpenZeppelin Libraries | ✔ |
-| Functional collection base smart contract | ✔ |
-| Clean JS and HTML | ✔ |
-| Simple and adaptable frontend | ✔ |
 
 ## How to use 📝
 
