@@ -1,9 +1,11 @@
 const NETWORK_ID = 4
 const NFT_PRICE = 10000000000000000
+const MAX_SUPPLY = 20
 var contract
 var accounts
 var web3
 var balance
+var available
 
 function metamaskReloadCallback()
 {
@@ -113,9 +115,13 @@ async function loadApp() {
           contract = await getContract(web3);
           var awaitAccounts = async function () {
             accounts = await web3.eth.getAccounts()
-            document.getElementById("web3_message").textContent="Connected";
+            document.getElementById("web3_message").textContent="Connected"
             balance = await contract.methods.balanceOf(accounts[0]).call()
-            document.getElementById("nft_balance").textContent=balance;
+            total_mint = await contract.methods.totalMint().call()
+            available = MAX_SUPPLY - total_mint
+
+            document.getElementById("nft_balance").textContent=balance
+            document.getElementById("total_mint").textContent=available
           };
           awaitAccounts();
         };
