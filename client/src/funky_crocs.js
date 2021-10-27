@@ -1,6 +1,7 @@
 const NETWORK_ID = 4
-var NFT_PRICE = 10000000000000000
-var MAX_SUPPLY = 20
+var NFT_PRICE = null
+var PRESALE_PRICE = null
+var MAX_SUPPLY = null
 var contract
 var accounts
 var web3
@@ -121,11 +122,16 @@ async function loadDapp() {
         var awaitContract = async function () {
           contract = await getContract(web3);
           NFT_PRICE = await contract.methods.price().call()
+          PRESALE_PRICE = await contract.methods.presale_price().call()
           MAX_SUPPLY = await contract.methods.MAX_SUPPLY().call()
           total_mint = await contract.methods.totalSupply().call()
           available = MAX_SUPPLY - total_mint
-          document.getElementById("total_mint").textContent=available + "/" + MAX_SUPPLY + " available"
-          document.getElementById("price").textContent= "Price: " + web3.utils.fromWei(NFT_PRICE) + " ETH"
+          if(document.getElementById("total_mint"))
+            document.getElementById("total_mint").textContent=available + "/" + MAX_SUPPLY + " available"
+          if(document.getElementById("price"))
+            document.getElementById("price").textContent= "Price: " + web3.utils.fromWei(NFT_PRICE) + " ETH"
+          if(document.getElementById("presale_price"))
+            document.getElementById("presale_price").textContent= "Presale Price: " + web3.utils.fromWei(PRESALE_PRICE) + " ETH"
           web3.eth.getAccounts(function(err, accounts){
             if (err != null)
               console.error("An error occurred: "+err);
@@ -170,7 +176,7 @@ const mint = async () => {
 
 const mintPresale = async () => {
   let mint_amount = document.getElementById("mint_amount").value
-  const result = await contract.methods.mintPresale(accounts[0], mint_amount)
+  const result = await contract.methods.mintPresale(mint_amount)
     .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";

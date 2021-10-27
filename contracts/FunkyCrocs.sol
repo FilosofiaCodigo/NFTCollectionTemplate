@@ -22,6 +22,8 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
 
     // Maximum limit of tokens that can ever exist
     uint256 public constant MAX_SUPPLY = 10000;
+    uint256 public constant MAX_PRESALE_SUPPLY = 500;
+    uint256 public constant MAX_MINT_PER_TX = 20;
 
     // The base link that leads to the image / video of the token
     string public baseTokenURI = "https://api.funkycrocs.io/";
@@ -36,7 +38,7 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
     // List of addresses that have a number of reserved tokens for whitelist
     mapping (address => uint256) public whitelistReserved;
 
-    constructor () ERC721 ("Funky Crocs", "FKYC") {
+    constructor () ERC721 ("Funky Crocs", "FNK") {
         price = initial_price;
     }
 
@@ -59,11 +61,11 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
     function mintWhitelist(uint256 _amount) public payable {
         uint256 supply = totalSupply();
         uint256 reservedAmt = whitelistReserved[msg.sender];
-        require( whitelistActive,                  "Whitelist isn't active" );
-        require( reservedAmt > 0,                "No tokens reserved for your address" );
-        require( _amount <= reservedAmt,         "Can't mint more than reserved" );
-        require( supply + _amount <= MAX_SUPPLY, "Can't mint more than max supply" );
-        require( msg.value == price * _amount,   "Wrong amount of ETH sent" );
+        require( whitelistActive,                   "Whitelist isn't active" );
+        require( reservedAmt > 0,                   "No tokens reserved for your address" );
+        require( _amount <= reservedAmt,            "Can't mint more than reserved" );
+        require( supply + _amount <= MAX_SUPPLY,    "Can't mint more than max supply" );
+        require( msg.value == price * _amount,      "Wrong amount of ETH sent" );
         whitelistReserved[msg.sender] = reservedAmt - _amount;
         for(uint256 i; i < _amount; i++){
             _safeMint( msg.sender, supply + i );
@@ -71,21 +73,24 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
     }
 
     // Presale minting
-    function mintPresale() public payable {
+    function mintPresale(uint256 _amount) public payable {
         uint256 supply = totalSupply();
-        require( presaleActive,             "Presale isn't active" );
-        require( supply + 1 <= 500,         "Can't mint more than 500 during Presale" );
-        require( msg.value == presale_price,   "Wrong amount of ETH sent" );
-        _safeMint( msg.sender, supply + 1 );
+        require( presaleActive,                             "Sale isn't active" );
+        require( _amount > 0 && _amount <= MAX_MINT_PER_TX,     "Can only mint between 1 and 20 tokens at once" );
+        require( supply + _amount <= MAX_PRESALE_SUPPLY,    "Can't mint more than max supply" );
+        require( msg.value == price * _amount,              "Wrong amount of ETH sent" );
+        for(uint256 i; i < _amount; i++){
+            _safeMint( msg.sender, supply + i );
+        }
     }
 
     // Standard mint function
     function mintToken(uint256 _amount) public payable {
         uint256 supply = totalSupply();
-        require( saleActive,                     "Sale isn't active" );
-        require( _amount > 0 && _amount < 11,    "Can only mint between 1 and 10 tokens at once" );
-        require( supply + _amount <= MAX_SUPPLY, "Can't mint more than max supply" );
-        require( msg.value == price * _amount,   "Wrong amount of ETH sent" );
+        require( saleActive,                                "Sale isn't active" );
+        require( _amount > 0 && _amount <= MAX_MINT_PER_TX,     "Can only mint between 1 and 10 tokens at once" );
+        require( supply + _amount <= MAX_SUPPLY,            "Can't mint more than max supply" );
+        require( msg.value == price * _amount,              "Wrong amount of ETH sent" );
         for(uint256 i; i < _amount; i++){
             _safeMint( msg.sender, supply + i );
         }
