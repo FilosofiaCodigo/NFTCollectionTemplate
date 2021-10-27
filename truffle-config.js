@@ -15,7 +15,7 @@ module.exports = {
         return new HDWalletProvider(process.env.PRIVATE_KEY, process.env.RINKEBY_RPC_URL);
       },
       network_id: 4,
-      gas: 4000000
+      skipDryRun: true,
     }
   },
   mocha: {

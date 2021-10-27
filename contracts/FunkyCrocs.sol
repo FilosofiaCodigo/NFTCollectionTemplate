@@ -7,22 +7,24 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 contract FunkyCrocs is ERC721Enumerable, Ownable {  
     using Address for address;
     
-    // Starting and stopping sale and presale
+    // Starting and stopping sale and whitelist
     bool public saleActive = false;
+    bool public whitelistActive = false;
     bool public presaleActive = false;
 
     // Reserved for the team, customs, giveaways, collabs and so on.
     uint256 public reserved = 150;
 
     // Price of each token
-    uint256 public initial_price = 0.03 ether;
+    uint256 public initial_price = 0.04 ether;
+    uint256 public presale_price = 0.03 ether;
     uint256 public price;
 
     // Maximum limit of tokens that can ever exist
-    uint256 constant MAX_SUPPLY = 10000;
+    uint256 public constant MAX_SUPPLY = 10000;
 
     // The base link that leads to the image / video of the token
-    string public baseTokenURI = "http://134.209.33.178:3000/";
+    string public baseTokenURI = "https://api.funkycrocs.io/";
 
     // Team addresses for withdrawals
     address public a1;
@@ -31,8 +33,8 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
     address public a4;
     address public a5;
 
-    // List of addresses that have a number of reserved tokens for presale
-    mapping (address => uint256) public presaleReserved;
+    // List of addresses that have a number of reserved tokens for whitelist
+    mapping (address => uint256) public whitelistReserved;
 
     constructor () ERC721 ("Funky Crocs", "FKYC") {
         price = initial_price;
@@ -53,19 +55,28 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
         return tokensId;
     }
 
-    // Exclusive presale minting
-    function mintPresale(uint256 _amount) public payable {
+    // Exclusive whitelist minting
+    function mintWhitelist(uint256 _amount) public payable {
         uint256 supply = totalSupply();
-        uint256 reservedAmt = presaleReserved[msg.sender];
-        require( presaleActive,                  "Presale isn't active" );
+        uint256 reservedAmt = whitelistReserved[msg.sender];
+        require( whitelistActive,                  "Whitelist isn't active" );
         require( reservedAmt > 0,                "No tokens reserved for your address" );
         require( _amount <= reservedAmt,         "Can't mint more than reserved" );
         require( supply + _amount <= MAX_SUPPLY, "Can't mint more than max supply" );
         require( msg.value == price * _amount,   "Wrong amount of ETH sent" );
-        presaleReserved[msg.sender] = reservedAmt - _amount;
+        whitelistReserved[msg.sender] = reservedAmt - _amount;
         for(uint256 i; i < _amount; i++){
             _safeMint( msg.sender, supply + i );
         }
+    }
+
+    // Presale minting
+    function mintPresale() public payable {
+        uint256 supply = totalSupply();
+        require( presaleActive,             "Presale isn't active" );
+        require( supply + 1 <= 500,         "Can't mint more than 500 during Presale" );
+        require( msg.value == presale_price,   "Wrong amount of ETH sent" );
+        _safeMint( msg.sender, supply + 1 );
     }
 
     // Standard mint function
@@ -91,11 +102,16 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
         }
     }
     
-    // Edit reserved presale spots
-    function editPresaleReserved(address[] memory _a, uint256[] memory _amount) public onlyOwner {
+    // Edit reserved whitelist spots
+    function editWhitelistReserved(address[] memory _a, uint256[] memory _amount) public onlyOwner {
         for(uint256 i; i < _a.length; i++){
-            presaleReserved[_a[i]] = _amount[i];
+            whitelistReserved[_a[i]] = _amount[i];
         }
+    }
+
+    // Start and stop whitelist
+    function setWhitelistActive(bool val) public onlyOwner {
+        whitelistActive = val;
     }
 
     // Start and stop presale
