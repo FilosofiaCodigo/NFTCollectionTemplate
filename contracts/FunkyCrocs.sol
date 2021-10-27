@@ -7,7 +7,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 contract FunkyCrocs is ERC721Enumerable, Ownable {  
     using Address for address;
     
-    // Starting and stopping sale and whitelist
+    // Starting and stopping sale, presale and whitelist
     bool public saleActive = false;
     bool public whitelistActive = false;
     bool public presaleActive = false;
@@ -32,8 +32,6 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
     address public a1;
     address public a2;
     address public a3;
-    address public a4;
-    address public a5;
 
     // List of addresses that have a number of reserved tokens for whitelist
     mapping (address => uint256) public whitelistReserved;
@@ -76,9 +74,9 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
     function mintPresale(uint256 _amount) public payable {
         uint256 supply = totalSupply();
         require( presaleActive,                             "Sale isn't active" );
-        require( _amount > 0 && _amount <= MAX_MINT_PER_TX,     "Can only mint between 1 and 20 tokens at once" );
+        require( _amount > 0 && _amount <= MAX_MINT_PER_TX, "Can only mint between 1 and 20 tokens at once" );
         require( supply + _amount <= MAX_PRESALE_SUPPLY,    "Can't mint more than max supply" );
-        require( msg.value == price * _amount,              "Wrong amount of ETH sent" );
+        require( msg.value == presale_price * _amount,      "Wrong amount of ETH sent" );
         for(uint256 i; i < _amount; i++){
             _safeMint( msg.sender, supply + i );
         }
@@ -88,7 +86,7 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
     function mintToken(uint256 _amount) public payable {
         uint256 supply = totalSupply();
         require( saleActive,                                "Sale isn't active" );
-        require( _amount > 0 && _amount <= MAX_MINT_PER_TX,     "Can only mint between 1 and 10 tokens at once" );
+        require( _amount > 0 && _amount <= MAX_MINT_PER_TX, "Can only mint between 1 and 10 tokens at once" );
         require( supply + _amount <= MAX_SUPPLY,            "Can't mint more than max supply" );
         require( msg.value == price * _amount,              "Wrong amount of ETH sent" );
         for(uint256 i; i < _amount; i++){
@@ -144,21 +142,13 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
         a1 = _a[0];
         a2 = _a[1];
         a3 = _a[2];
-        a4 = _a[3];
-        a5 = _a[4];
     }
 
     // Withdraw funds from contract for the team
     function withdrawTeam(uint256 amount) public payable onlyOwner {
         uint256 percent = amount / 100;
-        // 21% Split evenly among the team
-        require(payable(a1).send(percent * 21));
-        require(payable(a2).send(percent * 21));
-        require(payable(a3).send(percent * 21));
-        require(payable(a4).send(percent * 21));
-        // 16% to the community wallet
-        // Half of that will go to charity
-        // The other half to invest back into community projects
-        require(payable(a5).send(percent * 16));
+        require(payable(a1).send(percent * 40));
+        require(payable(a2).send(percent * 30));
+        require(payable(a3).send(percent * 30));
     }
 }

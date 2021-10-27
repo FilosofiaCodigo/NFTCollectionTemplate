@@ -2,6 +2,7 @@ const NETWORK_ID = 4
 var NFT_PRICE = null
 var PRESALE_PRICE = null
 var MAX_SUPPLY = null
+var MAX_PRESALE_SUPPLY = null
 var contract
 var accounts
 var web3
@@ -26,7 +27,7 @@ const getAccounts = async () => {
     await window.ethereum.request({ method: "eth_requestAccounts" })
     resolve(web3)
   } catch (error) {
-    reject(error);
+    console.log(error)
   }
 }
 
@@ -124,10 +125,14 @@ async function loadDapp() {
           NFT_PRICE = await contract.methods.price().call()
           PRESALE_PRICE = await contract.methods.presale_price().call()
           MAX_SUPPLY = await contract.methods.MAX_SUPPLY().call()
+          MAX_PRESALE_SUPPLY = await contract.methods.MAX_PRESALE_SUPPLY().call()
           total_mint = await contract.methods.totalSupply().call()
           available = MAX_SUPPLY - total_mint
+          available_presale = MAX_PRESALE_SUPPLY - total_mint
           if(document.getElementById("total_mint"))
-            document.getElementById("total_mint").textContent=available + "/" + MAX_SUPPLY + " available"
+            document.getElementById("total_mint").textContent = available + "/" + MAX_SUPPLY + " available"
+          if(document.getElementById("total_mint_presale"))
+            document.getElementById("total_mint_presale").textContent = available_presale + "/" + MAX_PRESALE_SUPPLY + " available"
           if(document.getElementById("price"))
             document.getElementById("price").textContent= "Price: " + web3.utils.fromWei(NFT_PRICE) + " ETH"
           if(document.getElementById("presale_price"))
@@ -177,7 +182,7 @@ const mint = async () => {
 const mintPresale = async () => {
   let mint_amount = document.getElementById("mint_amount").value
   const result = await contract.methods.mintPresale(mint_amount)
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+    .send({ from: accounts[0], gas: 0, value: PRESALE_PRICE * mint_amount })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
@@ -193,7 +198,7 @@ const mintPresale = async () => {
 const mintReserved = async () => {
   let mint_amount = document.getElementById("mint_amount").value
   const result = await contract.methods.mintReserved(mint_amount)
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+    .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
@@ -205,9 +210,8 @@ const mintReserved = async () => {
 }
 
 const editPresaleReserved = async () => {
-  let mint_amount = document.getElementById("mint_amount").value
   const result = await contract.methods.editPresaleReserved(["0xA","0xB"],[0,0])
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+    .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
@@ -219,9 +223,8 @@ const editPresaleReserved = async () => {
 }
 
 const setPresaleActive = async () => {
-  let mint_amount = document.getElementById("mint_amount").value
   const result = await contract.methods.setPresaleActive(true)
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+    .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
@@ -233,9 +236,8 @@ const setPresaleActive = async () => {
 }
 
 const setSaleActive = async () => {
-  let mint_amount = document.getElementById("mint_amount").value
   const result = await contract.methods.setSaleActive(true)
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+    .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
@@ -247,9 +249,8 @@ const setSaleActive = async () => {
 }
 
 const setBaseURI = async () => {
-  let mint_amount = document.getElementById("mint_amount").value
   const result = await contract.methods.setBaseURI("http://")
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+    .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
@@ -261,9 +262,8 @@ const setBaseURI = async () => {
 }
 
 const setPrice = async () => {
-  let mint_amount = document.getElementById("mint_amount").value
   const result = await contract.methods.setPrice(10000000)
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+    .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
@@ -275,9 +275,21 @@ const setPrice = async () => {
 }
 
 const setAddresses = async () => {
-  let mint_amount = document.getElementById("mint_amount").value
-  const result = await contract.methods.setAddresses(["0xA","0xB"])
-    .send({ from: accounts[0], gas: 0, value: NFT_PRICE * mint_amount })
+  const result = await contract.methods.setAddresses(["0x707e55a12557E89915D121932F83dEeEf09E5d70","0x707e55a12557E89915D121932F83dEeEf09E5d70","0x707e55a12557E89915D121932F83dEeEf09E5d70"])
+    .send({ from: accounts[0], gas: 0, value: 0 })
+    .on('transactionHash', function(hash){
+      document.getElementById("web3_message").textContent="Minting...";
+    })
+    .on('receipt', function(receipt){
+      document.getElementById("web3_message").textContent="Success! Minting finished.";    })
+    .catch((revertReason) => {
+      getRevertReason(revertReason.receipt.transactionHash);
+    });
+}
+
+const withdrawTeam = async () => {
+  const result = await contract.methods.withdrawTeam("100000000000000000")
+    .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
     })
