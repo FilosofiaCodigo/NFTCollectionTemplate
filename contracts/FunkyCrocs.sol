@@ -17,7 +17,6 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
 
     // Price of each token
     uint256 public initial_price = 0.04 ether;
-    uint256 public presale_price = 0.03 ether;
     uint256 public price;
 
     // Maximum limit of tokens that can ever exist
@@ -76,7 +75,7 @@ contract FunkyCrocs is ERC721Enumerable, Ownable {
         require( presaleActive,                             "Sale isn't active" );
         require( _amount > 0 && _amount <= MAX_MINT_PER_TX, "Can only mint between 1 and 20 tokens at once" );
         require( supply + _amount <= MAX_PRESALE_SUPPLY,    "Can't mint more than max supply" );
-        require( msg.value == presale_price * _amount,      "Wrong amount of ETH sent" );
+        require( msg.value == price * _amount,              "Wrong amount of ETH sent" );
         for(uint256 i; i < _amount; i++){
             _safeMint( msg.sender, supply + i );
         }

@@ -16,6 +16,13 @@ module.exports = {
       },
       network_id: 4,
       skipDryRun: true,
+    },
+    mainnet: {
+      provider: function () {
+        return new HDWalletProvider(process.env.PRIVATE_KEY, process.env.MAINNET_RPC_URL);
+      },
+      network_id: 1,
+      skipDryRun: true,
     }
   },
   mocha: {
