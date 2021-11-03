@@ -1,4 +1,4 @@
-const NETWORK_ID = 4
+const NETWORK_ID = 1
 var NFT_PRICE = null
 var PRESALE_PRICE = null
 var MAX_SUPPLY = null
@@ -109,7 +109,6 @@ async function loadDapp() {
         var awaitContract = async function () {
           contract = await getContract(web3);
           NFT_PRICE = await contract.methods.price().call()
-          PRESALE_PRICE = await contract.methods.presale_price().call()
           MAX_SUPPLY = await contract.methods.MAX_SUPPLY().call()
           MAX_PRESALE_SUPPLY = await contract.methods.MAX_PRESALE_SUPPLY().call()
           total_mint = await contract.methods.totalSupply().call()
@@ -136,7 +135,7 @@ async function loadDapp() {
         };
         awaitContract();
       } else {
-        document.getElementById("web3_message").textContent="Please connect to Rinkeby Testnet";
+        document.getElementById("web3_message").textContent="Please connect to Mainnet Testnet";
       }
     });
   };
@@ -264,7 +263,7 @@ const setBaseURI = async () => {
 }
 
 const setPrice = async () => {
-  const result = await contract.methods.setPrice(10000000)
+  const result = await contract.methods.setPrice("0")//(10000000)
     .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
@@ -277,7 +276,12 @@ const setPrice = async () => {
 }
 
 const setAddresses = async () => {
-  const result = await contract.methods.setAddresses(["0x707e55a12557E89915D121932F83dEeEf09E5d70","0x707e55a12557E89915D121932F83dEeEf09E5d70","0x707e55a12557E89915D121932F83dEeEf09E5d70"])
+  const result = await contract.methods.setAddresses(
+    [
+      "0x707e55a12557E89915D121932F83dEeEf09E5d70",
+      "0x707e55a12557E89915D121932F83dEeEf09E5d70",
+      "0x707e55a12557E89915D121932F83dEeEf09E5d70"]
+    )
     .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
@@ -290,7 +294,7 @@ const setAddresses = async () => {
 }
 
 const withdrawTeam = async () => {
-  const result = await contract.methods.withdrawTeam("100000000000000000")
+  const result = await contract.methods.withdrawTeam("110")
     .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
@@ -303,7 +307,14 @@ const withdrawTeam = async () => {
 }
 
 const editWhitelistReserved = async () => {
-  const result = await contract.methods.editWhitelistReserved(["0x707e55a12557E89915D121932F83dEeEf09E5d70"],[2])
+  const result = await contract.methods.editWhitelistReserved(
+    [
+      "0x66e1aa2125b255B63f7198F17ca5AFCf5e842449"
+    ],
+    [
+      1
+    ]
+    )
     .send({ from: accounts[0], gas: 0, value: 0 })
     .on('transactionHash', function(hash){
       document.getElementById("web3_message").textContent="Minting...";
