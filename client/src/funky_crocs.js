@@ -22,7 +22,7 @@ function metamaskReloadCallback()
 }
 
 const getAccounts = async () => {
-  metamaskReloadCallback()
+  //metamaskReloadCallback()
   try {
     await window.ethereum.request({ method: "eth_requestAccounts" })
     resolve(web3)
@@ -67,6 +67,8 @@ function handleEthereum(resolve, reject) {
   }
 }
 
+/*
+
 function handleRevertError(message) {
   alert(message)
 }
@@ -84,9 +86,10 @@ async function getRevertReason(txHash) {
       handleRevertError(json_reason.message)
     });
 }
+*/
 
 const getContract = async (web3) => {
-  const response = await fetch("./contracts/FunkyCrocs.json");
+  const response = await fetch("/contracts/FunkyCrocs.json");
   const data = await response.json();
 
   const netId = await web3.eth.net.getId();
@@ -156,7 +159,9 @@ loadDapp()
 
 document.getElementById("web3_message").textContent="Please connect to Metamask"
 
-/* SALE */
+/*
+
+// SALE 
 
 const mint = async () => {
   let mint_amount = document.getElementById("mint_amount").value
@@ -172,7 +177,7 @@ const mint = async () => {
     });
 }
 
-/* PRESALE */
+// PRESALE
 
 const mintPresale = async () => {
   let mint_amount = document.getElementById("mint_amount").value
@@ -188,7 +193,7 @@ const mintPresale = async () => {
     });
 }
 
-/* Whitelist */
+// Whitelist
 
 const mintWhitelist = async () => {
   let mint_amount = document.getElementById("mint_amount").value
@@ -204,7 +209,7 @@ const mintWhitelist = async () => {
     });
 }
 
-/* Owner */
+// Owner
 
 const mintReserved = async () => {
   let mint_amount = document.getElementById("mint_amount").value
@@ -407,3 +412,5 @@ const setWhitelistActive = async () => {
       getRevertReason(revertReason.receipt.transactionHash);
     });
 }
+
+*/
