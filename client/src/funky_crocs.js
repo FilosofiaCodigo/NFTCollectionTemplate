@@ -22,7 +22,7 @@ function metamaskReloadCallback()
 }
 
 const getAccounts = async () => {
-  //metamaskReloadCallback()
+  metamaskReloadCallback()
   try {
     await window.ethereum.request({ method: "eth_requestAccounts" })
     resolve(web3)
@@ -32,42 +32,30 @@ const getAccounts = async () => {
 }
 
 const getWeb3 = async () => {
-  document.getElementById("web3_message").textContent="Getting web3";
   return new Promise((resolve, reject) => {
-    if (window.ethereum) {
-      handleEthereum(resolve, reject);
-    } else {
-      window.addEventListener('ethereum#initialized', function()
-      {
-        handleEthereum(resolve, reject)
-        console.log('Ethereum successfully detected!');
-      }, {
-        once: true,
+    if(document.readyState=="complete")
+    {
+      if (window.ethereum) {
+        const web3 = new Web3(window.ethereum)
+        resolve(web3)
+      } else {
+        reject("must install MetaMask")
+        document.getElementById("web3_message").textContent="Error: Please install Metamask";
+      }
+    }else
+    {
+      window.addEventListener("load", async () => {
+        if (window.ethereum) {
+          const web3 = new Web3(window.ethereum)
+          resolve(web3)
+        } else {
+          reject("must install MetaMask")
+          document.getElementById("web3_message").textContent="Error: Please install Metamask";
+        }
       });
-
-      document.getElementById("web3_message").textContent="Waiting 3s";
-    
-      // If the event is not dispatched by the end of the timeout,
-      // the user probably doesn't have MetaMask installed.
-      setTimeout(handleEthereum, 3000); // 3 seconds
     }
   });
 };
-
-function handleEthereum(resolve, reject) {
-  const { ethereum } = window;
-  if (ethereum && ethereum.isMetaMask) {
-    console.log('Ethereum successfully detected!');
-    // Access the decentralized web!
-    resolve(new Web3(window.ethereum))
-  } else {
-    console.log('Please install MetaMask!');
-    document.getElementById("web3_message").textContent="Error: 11";
-    reject('Please install MetaMask!')
-  }
-}
-
-/*
 
 function handleRevertError(message) {
   alert(message)
@@ -86,10 +74,9 @@ async function getRevertReason(txHash) {
       handleRevertError(json_reason.message)
     });
 }
-*/
 
 const getContract = async (web3) => {
-  const response = await fetch("/contracts/FunkyCrocs.json");
+  const response = await fetch("./contracts/FunkyCrocs.json");
   const data = await response.json();
 
   const netId = await web3.eth.net.getId();
@@ -159,9 +146,7 @@ loadDapp()
 
 document.getElementById("web3_message").textContent="Please connect to Metamask"
 
-/*
-
-// SALE 
+/* SALE */
 
 const mint = async () => {
   let mint_amount = document.getElementById("mint_amount").value
@@ -177,7 +162,7 @@ const mint = async () => {
     });
 }
 
-// PRESALE
+/* PRESALE */
 
 const mintPresale = async () => {
   let mint_amount = document.getElementById("mint_amount").value
@@ -193,7 +178,7 @@ const mintPresale = async () => {
     });
 }
 
-// Whitelist
+/* Whitelist */
 
 const mintWhitelist = async () => {
   let mint_amount = document.getElementById("mint_amount").value
@@ -209,7 +194,7 @@ const mintWhitelist = async () => {
     });
 }
 
-// Owner
+/* Owner */
 
 const mintReserved = async () => {
   let mint_amount = document.getElementById("mint_amount").value
@@ -412,5 +397,3 @@ const setWhitelistActive = async () => {
       getRevertReason(revertReason.receipt.transactionHash);
     });
 }
-
-*/
