@@ -40,7 +40,7 @@ const getWeb3 = async () => {
         resolve(web3)
       } else {
         reject("must install MetaMask")
-        document.getElementById("web3_message").textContent="Error: Please install Metamask";
+        document.getElementById("web3_message").textContent="Error: Please install Metamask A";
       }
     }else
     {
@@ -50,7 +50,7 @@ const getWeb3 = async () => {
           resolve(web3)
         } else {
           reject("must install MetaMask")
-          document.getElementById("web3_message").textContent="Error: Please install Metamask";
+          document.getElementById("web3_message").textContent="Error: Please install Metamask B";
         }
       });
     }
