@@ -33,29 +33,34 @@ const getAccounts = async () => {
 
 const getWeb3 = async () => {
   return new Promise((resolve, reject) => {
-    if(document.readyState=="complete")
-    {
-      if (window.ethereum) {
-        const web3 = new Web3(window.ethereum)
-        resolve(web3)
-      } else {
-        reject("must install MetaMask")
-        document.getElementById("web3_message").textContent="Error: Please install Metamask A";
-      }
-    }else
-    {
-      window.addEventListener("load", async () => {
-        if (window.ethereum) {
-          const web3 = new Web3(window.ethereum)
-          resolve(web3)
-        } else {
-          reject("must install MetaMask")
-          document.getElementById("web3_message").textContent="Error: Please install Metamask B";
-        }
+    if (window.ethereum) {
+      handleEthereum(resolve, reject);
+    } else {
+      window.addEventListener('ethereum#initialized', function()
+      {
+        handleEthereum(resolve, reject)
+      }, {
+        once: true,
       });
+    
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
     }
   });
 };
+
+function handleEthereum(resolve, reject) {
+  const { ethereum } = window;
+  if (ethereum && ethereum.isMetaMask) {
+    console.log('Ethereum successfully detected!');
+    // Access the decentralized web!
+    resolve(new Web3(window.ethereum))
+  } else {
+    console.log('Please install MetaMask!');
+    reject('Please install MetaMask!')
+  }
+}
 
 function handleRevertError(message) {
   alert(message)
@@ -89,9 +94,6 @@ const getContract = async (web3) => {
 }
 
 async function connectWallet() {
-  document.getElementById("web3_message").textContent="Connect X";
-  web3 = await getWeb3()
-  document.getElementById("web3_message").textContent="Connect Y";
   getAccounts()
 }
 
@@ -99,7 +101,7 @@ async function loadAccount() {
   accounts = await web3.eth.getAccounts()
   balance = await contract.methods.balanceOf(accounts[0]).call()
   document.getElementById("web3_message").textContent="Connected"
-  //document.getElementById("connect_button").style.display = "none"
+  document.getElementById("connect_button").style.display = "none"
   document.getElementById("nft_balance").textContent="You have " + balance + " Crocs"
 }
 
