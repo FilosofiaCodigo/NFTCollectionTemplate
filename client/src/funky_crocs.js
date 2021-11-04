@@ -32,6 +32,7 @@ const getAccounts = async () => {
 }
 
 const getWeb3 = async () => {
+  document.getElementById("web3_message").textContent="Getting web3";
   return new Promise((resolve, reject) => {
     if (window.ethereum) {
       handleEthereum(resolve, reject);
@@ -39,9 +40,12 @@ const getWeb3 = async () => {
       window.addEventListener('ethereum#initialized', function()
       {
         handleEthereum(resolve, reject)
+        console.log('Ethereum successfully detected!');
       }, {
         once: true,
       });
+
+      document.getElementById("web3_message").textContent="Waiting 3s";
     
       // If the event is not dispatched by the end of the timeout,
       // the user probably doesn't have MetaMask installed.
@@ -58,6 +62,7 @@ function handleEthereum(resolve, reject) {
     resolve(new Web3(window.ethereum))
   } else {
     console.log('Please install MetaMask!');
+    document.getElementById("web3_message").textContent="Error: 11";
     reject('Please install MetaMask!')
   }
 }
