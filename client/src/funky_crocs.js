@@ -1,4 +1,4 @@
-const NETWORK_ID = 1
+const NETWORK_ID = 4
 var NFT_PRICE = null
 var PRESALE_PRICE = null
 var MAX_SUPPLY = null
@@ -135,7 +135,7 @@ async function loadDapp() {
         };
         awaitContract();
       } else {
-        document.getElementById("web3_message").textContent="Please connect to Mainnet Testnet";
+        document.getElementById("web3_message").textContent="Please connect to Rinkeby Testnet";
       }
     });
   };
